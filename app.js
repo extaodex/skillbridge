@@ -174,10 +174,20 @@
           <div style="display:flex;align-items:center;gap:12px">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36" aria-label="SKILLBRIDGE">
               <rect x="2" y="2" width="44" height="44" rx="10" fill="#D9A441"/>
-              <path d="M12 30 Q24 14 36 30" stroke="#1F6F54" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <rect x="14" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
-              <rect x="30" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
-              <circle cx="24" cy="20" r="3" fill="#0B1F1A"/>
+              <circle cx="16" cy="16" r="7" fill="#1F6F54"/>
+              <circle cx="24" cy="12" r="8" fill="#1F6F54"/>
+              <circle cx="32" cy="16" r="7" fill="#1F6F54"/>
+              <circle cx="20" cy="20" r="6" fill="#2D8B6A"/>
+              <circle cx="28" cy="20" r="6" fill="#2D8B6A"/>
+              <rect x="20" y="22" width="8" height="14" rx="2" fill="#0B1F1A"/>
+              <path d="M20 36 Q16 38 14 40" stroke="#0B1F1A" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M28 36 Q32 38 34 40" stroke="#0B1F1A" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <circle cx="14" cy="40" r="2" fill="#F7F5F0"/>
+              <rect x="12.5" y="42" width="3" height="4" rx="1" fill="#F7F5F0"/>
+              <circle cx="24" cy="40" r="2" fill="#F7F5F0"/>
+              <rect x="22.5" y="42" width="3" height="4" rx="1" fill="#F7F5F0"/>
+              <circle cx="34" cy="40" r="2" fill="#F7F5F0"/>
+              <rect x="32.5" y="42" width="3" height="4" rx="1" fill="#F7F5F0"/>
             </svg>
             <div>
               <div class="brand">Skill<span>bridge</span></div>
@@ -222,10 +232,20 @@
           <div>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" aria-label="SKILLBRIDGE" style="margin-bottom:24px">
               <rect x="2" y="2" width="44" height="44" rx="10" fill="#D9A441"/>
-              <path d="M12 30 Q24 14 36 30" stroke="#1F6F54" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <rect x="14" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
-              <rect x="30" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
-              <circle cx="24" cy="20" r="3" fill="#0B1F1A"/>
+              <circle cx="16" cy="16" r="7" fill="#1F6F54"/>
+              <circle cx="24" cy="12" r="8" fill="#1F6F54"/>
+              <circle cx="32" cy="16" r="7" fill="#1F6F54"/>
+              <circle cx="20" cy="20" r="6" fill="#2D8B6A"/>
+              <circle cx="28" cy="20" r="6" fill="#2D8B6A"/>
+              <rect x="20" y="22" width="8" height="14" rx="2" fill="#0B1F1A"/>
+              <path d="M20 36 Q16 38 14 40" stroke="#0B1F1A" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M28 36 Q32 38 34 40" stroke="#0B1F1A" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <circle cx="14" cy="40" r="2" fill="#F7F5F0"/>
+              <rect x="12.5" y="42" width="3" height="4" rx="1" fill="#F7F5F0"/>
+              <circle cx="24" cy="40" r="2" fill="#F7F5F0"/>
+              <rect x="22.5" y="42" width="3" height="4" rx="1" fill="#F7F5F0"/>
+              <circle cx="34" cy="40" r="2" fill="#F7F5F0"/>
+              <rect x="32.5" y="42" width="3" height="4" rx="1" fill="#F7F5F0"/>
             </svg>
             <h1>Échange tes <em>compétences</em>, grandis ensemble.</h1>
             <p>SKILLBRIDGE Africa connecte les étudiants qui veulent apprendre avec ceux qui peuvent enseigner. Gagne des SkillCredits en partageant ton savoir.</p>
