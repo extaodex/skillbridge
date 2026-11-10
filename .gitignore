@@ -3,6 +3,7 @@ node_modules/
 
 # Supabase local
 .supabase/
+supabase/.temp/
 
 # Secrets / config locale
 config.js

@@ -24,8 +24,8 @@ cp config.example.js config.js
 ### 3. Initialiser la base de données
 
 Dans le SQL Editor de Supabase, exécute dans l'ordre :
-1. `supabase/migrations/init_schema.sql`
-2. `supabase/migrations/0002_fix_rls_and_credits.sql` (si projet déjà déployé)
+1. `supabase/migrations/20261110000000_init_schema.sql`
+2. `supabase/migrations/20261110000001_fix_rls_and_credits.sql` (si projet déjà déployé)
 
 ### 4. Déployer les Edge Functions
 

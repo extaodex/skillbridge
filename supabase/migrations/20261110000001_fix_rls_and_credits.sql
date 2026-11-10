@@ -1,11 +1,26 @@
 -- Delta migration : RLS manquantes + attribution atomique des crédits
 -- À exécuter sur les projets déjà déployés avec init_schema.sql v2.0
 
-CREATE POLICY IF NOT EXISTS "Notifications insertable by authenticated"
-  ON notifications FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
-
-CREATE POLICY IF NOT EXISTS "Credit ledger insertable by authenticated"
-  ON credit_ledger FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE policyname = 'Notifications insertable by authenticated'
+      AND tablename = 'notifications'
+  ) THEN
+    CREATE POLICY "Notifications insertable by authenticated"
+      ON notifications FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE policyname = 'Credit ledger insertable by authenticated'
+      AND tablename = 'credit_ledger'
+  ) THEN
+    CREATE POLICY "Credit ledger insertable by authenticated"
+      ON credit_ledger FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+  END IF;
+END
+$$;
 
 CREATE OR REPLACE FUNCTION award_session_credits(p_session_id UUID)
 RETURNS JSONB
