@@ -1,0 +1,17 @@
+# Dépendances
+node_modules/
+
+# Supabase local
+.supabase/
+
+# Secrets / config locale
+config.js
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

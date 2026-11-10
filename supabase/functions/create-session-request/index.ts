@@ -7,9 +7,10 @@ export default async (req) => {
     Deno.env.get('SUPABASE_ANON_KEY')
   );
 
-  const authHeader = req.headers.get('authorization');
-  const { data: { user } } = await supabase.auth.getUser(authHeader);
-  if (!user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  const authHeader = req.headers.get('authorization') || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
 
   const { teacher_id, skill_id, mode, scheduled_at, duration_minutes } = await req.json();
 
