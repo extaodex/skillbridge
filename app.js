@@ -1,4 +1,4 @@
-/* SKILLBRIDGE Africa - Frontend (vanilla JS) */
+/* SKILLBRIDGE Africa — Frontend */
 (function () {
   'use strict';
 
@@ -12,7 +12,6 @@
     mySessions: [],
     notifications: [],
     skills: [],
-    error: null,
   };
 
   // ---------- Utils ----------
@@ -24,15 +23,12 @@
 
   function toast(msg, type) {
     const el = document.createElement('div');
-    el.className = 'card';
-    el.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;max-width:320px;border-left:4px solid ' +
-      (type === 'error' ? 'var(--danger)' : 'var(--success)');
+    el.className = 'toast' + (type === 'error' ? ' error' : '');
     el.textContent = msg;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 3500);
   }
 
-  // ---------- Supabase init ----------
   function checkConfig() {
     if (!window.SUPABASE_URL || window.SUPABASE_URL.includes('YOUR_')) return false;
     if (!window.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY.includes('YOUR_')) return false;
@@ -41,20 +37,11 @@
 
   function initSupabase() {
     if (!checkConfig()) {
-      renderConfigError();
+      $app.innerHTML = `<div class="config-error card"><h2>Configuration manquante</h2><p>Remplis <code>config.js</code> avec l'URL et la clé anon de ton projet Supabase, puis recharge la page.</p></div>`;
       return false;
     }
     supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     return true;
-  }
-
-  function renderConfigError() {
-    $app.innerHTML = `
-      <div class="card">
-        <h2>Configuration manquante</h2>
-        <p>Remplis <code>config.js</code> avec l'URL et la clé anon de ton projet Supabase
-        (Dashboard Supabase &gt; Settings &gt; API), puis recharge la page.</p>
-      </div>`;
   }
 
   // ---------- Auth ----------
@@ -69,7 +56,6 @@
     const { data, error } = await supabase
       .from('profiles').select('*').eq('id', state.user.id).single();
     if (error && error.code === 'PGRST116') {
-      // profil inexistant -> créer
       const username = (state.user.email || '').split('@')[0] + '_' + state.user.id.slice(0, 6);
       const { data: created } = await supabase.from('profiles').insert({
         id: state.user.id, username, display_name: username,
@@ -104,7 +90,7 @@
     render();
   }
 
-  // ---------- Data loading ----------
+  // ---------- Data ----------
   async function loadTeachers() {
     const { data } = await supabase
       .from('profiles')
@@ -178,55 +164,76 @@
   }
 
   // ---------- Rendering ----------
-  function renderHeader() {
-    if (!state.user) return '';
+  function shell(content) {
     const unread = state.notifications.filter(n => !n.read).length;
+    const p = state.profile;
+    const initial = (p && (p.display_name || p.username) || '?').charAt(0).toUpperCase();
     return `
-      <div class="header">
-        <div>
-          <h1>SKILLBRIDGE Africa</h1>
-          <div class="subtitle">Échange de compétences entre étudiants</div>
-        </div>
-        <div class="nav">
-          <button class="btn btn-outline" data-view="dashboard">Accueil</button>
-          <button class="btn btn-outline" data-view="teachers">Trouver un prof</button>
-          <button class="btn btn-outline" data-view="sessions">Mes séances</button>
-          <button class="btn btn-outline" data-view="notifs">Notifications ${unread ? '(' + unread + ')' : ''}</button>
-          <button class="btn btn-outline" id="logoutBtn">Déconnexion</button>
-        </div>
+      <div class="shell">
+        <aside class="sidebar">
+          <div>
+            <div class="brand">Skill<span>bridge</span></div>
+            <div class="tagline">Échange de compétences entre étudiants</div>
+          </div>
+          <nav>
+            <button data-view="dashboard" class="${state.view === 'dashboard' ? 'active' : ''}">Accueil</button>
+            <button data-view="teachers" class="${state.view === 'teachers' ? 'active' : ''}">Trouver un prof</button>
+            <button data-view="sessions" class="${state.view === 'sessions' ? 'active' : ''}">Mes séances</button>
+            <button data-view="notifs" class="${state.view === 'notifs' ? 'active' : ''}">Notifications ${unread ? '(' + unread + ')' : ''}</button>
+          </nav>
+          <div class="profile-mini">
+            <div class="name">${escapeHtml(p ? (p.display_name || p.username) : '')}</div>
+            <div class="level">${escapeHtml(p ? (p.level || 'Contributeur') : '')}</div>
+            <div class="credits">${p ? (p.total_credits || 0) : 0}</div>
+          </div>
+          <button class="btn btn-ghost" id="logoutBtn" style="margin-top:8px;align-self:flex-start">Déconnexion</button>
+        </aside>
+        <main class="main">${content}</main>
       </div>`;
   }
 
-  function renderProfileCard() {
-    const p = state.profile;
-    if (!p) return '';
-    const initial = (p.display_name || p.username || '?').charAt(0).toUpperCase();
-    return `
-      <div class="card profile-card">
-        <div class="avatar">${escapeHtml(initial)}</div>
-        <h3>${escapeHtml(p.display_name || p.username)}</h3>
-        <div class="level-badge">${escapeHtml(p.level || 'Contributeur')}</div>
-        <div>${escapeHtml(p.school || '')} ${p.study_domain ? '· ' + escapeHtml(p.study_domain) : ''}</div>
-        <div class="credits">${p.total_credits || 0} SkillCredits</div>
-      </div>`;
+  function wireNav() {
+    document.querySelectorAll('[data-view]').forEach(b => {
+      b.onclick = async () => {
+        state.view = b.getAttribute('data-view');
+        if (state.view === 'teachers') await loadTeachers();
+        if (state.view === 'sessions') await loadMySessions();
+        if (state.view === 'notifs') await loadNotifications();
+        render();
+      };
+    });
+    const logout = document.getElementById('logoutBtn');
+    if (logout) logout.onclick = signOut;
   }
 
   function renderAuth() {
     $app.innerHTML = `
-      ${renderHeader()}
-      <div class="grid">
-        <div class="card">
-          <h2>Connexion</h2>
-          <div class="form-group"><label>Email</label><input id="loginEmail" type="email"></div>
-          <div class="form-group"><label>Mot de passe</label><input id="loginPwd" type="password"></div>
-          <button class="btn btn-primary" id="loginBtn">Se connecter</button>
+      <div class="auth-wrap">
+        <div class="auth-side">
+          <div>
+            <h1>Échange tes <em>compétences</em>, grandis ensemble.</h1>
+            <p>SKILLBRIDGE Africa connecte les étudiants qui veulent apprendre avec ceux qui peuvent enseigner. Gagne des SkillCredits en partageant ton savoir.</p>
+          </div>
+          <div class="foot">© 2026 SKILLBRIDGE Africa</div>
         </div>
-        <div class="card">
-          <h2>Inscription</h2>
-          <div class="form-group"><label>Nom affiché</label><input id="signupName"></div>
-          <div class="form-group"><label>Email</label><input id="signupEmail" type="email"></div>
-          <div class="form-group"><label>Mot de passe</label><input id="signupPwd" type="password"></div>
-          <button class="btn btn-primary" id="signupBtn">Créer un compte</button>
+        <div class="auth-forms">
+          <div class="card">
+            <h2>Connexion</h2>
+            <div class="form" style="margin-top:16px">
+              <div class="form-group"><label>Email</label><input id="loginEmail" type="email" placeholder="toi@ecole.fr"></div>
+              <div class="form-group"><label>Mot de passe</label><input id="loginPwd" type="password"></div>
+              <button class="btn btn-primary" id="loginBtn">Se connecter</button>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Créer un compte</h2>
+            <div class="form" style="margin-top:16px">
+              <div class="form-group"><label>Nom affiché</label><input id="signupName" placeholder="Marie Dupont"></div>
+              <div class="form-group"><label>Email</label><input id="signupEmail" type="email" placeholder="toi@ecole.fr"></div>
+              <div class="form-group"><label>Mot de passe</label><input id="signupPwd" type="password"></div>
+              <button class="btn btn-accent" id="signupBtn">Créer mon compte</button>
+            </div>
+          </div>
         </div>
       </div>`;
     document.getElementById('loginBtn').onclick = async () => {
@@ -246,34 +253,86 @@
   }
 
   function renderDashboard() {
-    $app.innerHTML = `
-      ${renderHeader()}
-      <div class="grid">
-        ${renderProfileCard()}
-        <div class="card">
-          <h2>Bienvenue</h2>
-          <p>Utilise le menu pour trouver un prof, gérer tes séances et voir tes notifications.</p>
-          <div class="tabs" style="margin-top:15px">
-            <button class="tab" data-view="teachers">Trouver un prof</button>
-            <button class="tab" data-view="sessions">Mes séances (${state.mySessions.length})</button>
-          </div>
+    const p = state.profile;
+    const initial = (p && (p.display_name || p.username) || '?').charAt(0).toUpperCase();
+    const unread = state.notifications.filter(n => !n.read).length;
+    const content = `
+      <div class="profile-card">
+        <div class="avatar">${escapeHtml(initial)}</div>
+        <div class="info">
+          <h3>${escapeHtml(p ? (p.display_name || p.username) : '')}</h3>
+          <div class="meta">${escapeHtml(p && p.school ? p.school : 'Étudiant')} ${p && p.study_domain ? '· ' + escapeHtml(p.study_domain) : ''}</div>
+          <span class="level-badge">${escapeHtml(p ? (p.level || 'Contributeur') : 'Contributeur')}</span>
+        </div>
+        <div class="credits-block">
+          <div class="number">${p ? (p.total_credits || 0) : 0}</div>
+          <div class="label">SkillCredits</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Bienvenue</h2>
+        <p class="lede">Trouve un prof pour apprendre une compétence, ou propose la tienne pour gagner des crédits.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-primary" data-view="teachers">Trouver un prof</button>
+          <button class="btn btn-ghost" data-view="sessions">Mes séances (${state.mySessions.length})</button>
+          ${unread ? `<button class="btn btn-accent" data-view="notifs">${unread} notification${unread > 1 ? 's' : ''}</button>` : ''}
+        </div>
+      </div>
+
+      ${state.mySessions.length ? `
+      <div class="section">
+        <h2>Séances récentes</h2>
+        <div class="session-list">
+          ${state.mySessions.slice(0, 3).map(s => sessionItemHtml(s)).join('')}
+        </div>
+      </div>` : ''}`;
+    $app.innerHTML = shell(content);
+    wireNav();
+    bindSessionActions();
+  }
+
+  function sessionItemHtml(s) {
+    const isTeacher = s.teacher_id === state.user.id;
+    const statusCls = 'status-' + (s.status || 'pending');
+    const statusLabel = { pending: 'En attente', accepted: 'Acceptée', completed: 'Terminée', refused: 'Refusée' }[s.status] || s.status;
+    let actions = '';
+    if (isTeacher && s.status === 'pending') {
+      actions = `<button class="btn btn-primary" data-accept="${s.id}">Accepter</button>
+                 <button class="btn btn-ghost" data-refuse="${s.id}">Refuser</button>`;
+    }
+    if ((isTeacher || s.requester_id === state.user.id) && ['pending','accepted','scheduled','in_progress'].includes(s.status)) {
+      actions += ` <button class="btn btn-accent" data-complete="${s.id}">Valider</button>`;
+    }
+    return `
+      <div class="session-item">
+        <div class="info">
+          <h3>${escapeHtml(s.skills ? s.skills.name : 'Compétence')}</h3>
+          <p>${escapeHtml(s.mode === 'online' ? 'En ligne' : 'Présentiel')} · ${s.duration_minutes || 30} min${s.scheduled_at ? ' · ' + new Date(s.scheduled_at).toLocaleDateString('fr-FR') : ''}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <span class="status ${statusCls}">${escapeHtml(statusLabel)}</span>
+          <div class="actions">${actions}</div>
         </div>
       </div>`;
-    wireNav();
   }
 
   function renderTeachers() {
     const cards = state.teachers.map(t => `
-      <div class="card">
-        <h3>${escapeHtml(t.display_name || t.username)}</h3>
-        <div class="level-badge">${escapeHtml(t.level || 'Contributeur')}</div>
-        <p>${escapeHtml(t.school || '')} ${t.study_domain ? '· ' + escapeHtml(t.study_domain) : ''}</p>
-        <p><strong>${t.total_credits || 0}</strong> SkillCredits</p>
-        <button class="btn btn-primary" data-req="${t.id}">Demander une séance</button>
-      </div>`).join('') || '<div class="card">Aucun prof disponible pour le moment.</div>';
-    $app.innerHTML = `
-      ${renderHeader()}
-      <div class="card"><h2>Trouver un prof</h2><div class="grid">${cards}</div></div>`;
+      <div class="teacher-card">
+        <div class="name">${escapeHtml(t.display_name || t.username)}</div>
+        <div class="meta">${escapeHtml(t.school || 'Étudiant')} ${t.study_domain ? '· ' + escapeHtml(t.study_domain) : ''}</div>
+        <span class="level-badge" style="background:var(--accent);color:var(--paper);padding:3px 8px;border-radius:999px;font-size:0.75rem;font-weight:600;align-self:flex-start">${escapeHtml(t.level || 'Contributeur')}</span>
+        <div class="credits">${t.total_credits || 0} crédits</div>
+        <div class="actions"><button class="btn btn-primary" style="width:100%" data-req="${t.id}">Demander une séance</button></div>
+      </div>`).join('') || `<div class="empty"><strong>Aucun prof disponible</strong>Ajoute des compétences à ton profil pour apparaître ici.</div>`;
+    const content = `
+      <div class="section">
+        <h2>Trouver un prof</h2>
+        <p class="lede">Parcours les étudiants qui partagent leurs compétences.</p>
+        <div class="teacher-grid">${cards}</div>
+      </div>`;
+    $app.innerHTML = shell(content);
     wireNav();
     document.querySelectorAll('[data-req]').forEach(btn => {
       btn.onclick = () => openRequestModal(btn.getAttribute('data-req'));
@@ -284,17 +343,18 @@
     const teacher = state.teachers.find(t => t.id === teacherId);
     const skillOpts = state.skills.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
     const modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000';
+    modal.className = 'modal-backdrop';
     modal.innerHTML = `
-      <div class="card" style="max-width:480px;width:90%">
+      <div class="modal">
         <h2>Demande à ${escapeHtml(teacher.display_name || teacher.username)}</h2>
-        <div class="form-group"><label>Compétence</label><select id="mSkill">${skillOpts}</select></div>
-        <div class="form-group"><label>Mode</label>
-          <select id="mMode"><option value="online">En ligne</option><option value="in_person">En présentiel</option></select></div>
-        <div class="form-group"><label>Durée (min)</label><input id="mDur" type="number" value="30" min="15" step="15"></div>
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn" id="mCancel">Annuler</button>
-          <button class="btn btn-primary" id="mSend">Envoyer</button>
+        <div class="form">
+          <div class="form-group"><label>Compétence</label><select id="mSkill">${skillOpts || '<option value="">Aucune compétence</option>'}</select></div>
+          <div class="form-group"><label>Mode</label><select id="mMode"><option value="online">En ligne</option><option value="in_person">En présentiel</option></select></div>
+          <div class="form-group"><label>Durée (min)</label><input id="mDur" type="number" value="30" min="15" step="15"></div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" id="mCancel">Annuler</button>
+          <button class="btn btn-primary" id="mSend">Envoyer la demande</button>
         </div>
       </div>`;
     document.body.appendChild(modal);
@@ -309,33 +369,19 @@
   }
 
   function renderSessions() {
-    const rows = state.mySessions.map(s => {
-      const isTeacher = s.teacher_id === state.user.id;
-      const other = isTeacher ? s.requester_id : s.teacher_id;
-      const statusCls = 'status-' + (s.status || 'pending');
-      let actions = '';
-      if (isTeacher && s.status === 'pending') {
-        actions = `<button class="btn btn-primary" data-accept="${s.id}">Accepter</button>
-                   <button class="btn" data-refuse="${s.id}">Refuser</button>`;
-      }
-      if ((isTeacher || s.requester_id === state.user.id) && ['pending','accepted','scheduled','in_progress'].includes(s.status)) {
-        actions += ` <button class="btn btn-primary" data-complete="${s.id}">Valider la séance</button>`;
-      }
-      return `
-        <div class="session-card card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <strong>${escapeHtml(s.skills ? s.skills.name : 'Compétence')}</strong>
-            <span class="status ${statusCls}">${escapeHtml(s.status)}</span>
-          </div>
-          <p>Mode : ${escapeHtml(s.mode || '-')}, ${s.duration_minutes || 30} min</p>
-          <p>Planifié : ${s.scheduled_at ? new Date(s.scheduled_at).toLocaleString() : 'à définir'}</p>
-          <div style="margin-top:10px">${actions}</div>
-        </div>`;
-    }).join('') || '<div class="card">Aucune séance pour le moment.</div>';
-    $app.innerHTML = `
-      ${renderHeader()}
-      <div class="card"><h2>Mes séances</h2><div class="grid">${rows}</div></div>`;
+    const rows = state.mySessions.map(s => sessionItemHtml(s)).join('') || `<div class="empty"><strong>Aucune séance</strong>Demander une séance à un prof pour commencer.</div>`;
+    const content = `
+      <div class="section">
+        <h2>Mes séances</h2>
+        <p class="lede">Suis tes demandes et valide les séances terminées.</p>
+        <div class="session-list">${rows}</div>
+      </div>`;
+    $app.innerHTML = shell(content);
     wireNav();
+    bindSessionActions();
+  }
+
+  function bindSessionActions() {
     document.querySelectorAll('[data-accept]').forEach(b => b.onclick = () => updateSessionStatus(b.dataset.accept, 'accepted'));
     document.querySelectorAll('[data-refuse]').forEach(b => b.onclick = () => updateSessionStatus(b.dataset.refuse, 'refused'));
     document.querySelectorAll('[data-complete]').forEach(b => b.onclick = () => completeSession(b.dataset.complete));
@@ -343,33 +389,23 @@
 
   function renderNotifs() {
     const rows = state.notifications.map(n => `
-      <div class="notification ${n.read ? '' : 'unread'}">
+      <div class="notif-item ${n.read ? '' : 'unread'}">
         <div>
-          <strong>${escapeHtml(n.title)}</strong>
-          <div>${escapeHtml(n.body || '')}</div>
-          <small>${new Date(n.created_at).toLocaleString()}</small>
+          <div class="title">${escapeHtml(n.title)}</div>
+          <div class="body">${escapeHtml(n.body || '')}</div>
+          <div class="time">${new Date(n.created_at).toLocaleString('fr-FR')}</div>
         </div>
-        ${n.read ? '' : `<button class="btn" data-read="${n.id}">Marquer lu</button>`}
-      </div>`).join('') || '<div class="card">Aucune notification.</div>';
-    $app.innerHTML = `
-      ${renderHeader()}
-      <div class="card"><h2>Notifications</h2>${rows}</div>`;
+        ${n.read ? '' : `<button class="btn btn-ghost" data-read="${n.id}">Marquer lu</button>`}
+      </div>`).join('') || `<div class="empty"><strong>Aucune notification</strong>Tu seras informé ici des nouvelles demandes et crédits.</div>`;
+    const content = `
+      <div class="section">
+        <h2>Notifications</h2>
+        <p class="lede">Reste informé de l'activité sur ton compte.</p>
+        <div class="notif-list">${rows}</div>
+      </div>`;
+    $app.innerHTML = shell(content);
     wireNav();
     document.querySelectorAll('[data-read]').forEach(b => b.onclick = () => markNotifRead(b.dataset.read));
-  }
-
-  function wireNav() {
-    document.querySelectorAll('[data-view]').forEach(b => {
-      b.onclick = async () => {
-        state.view = b.getAttribute('data-view');
-        if (state.view === 'teachers') await loadTeachers();
-        if (state.view === 'sessions') await loadMySessions();
-        if (state.view === 'notifs') await loadNotifications();
-        render();
-      };
-    });
-    const logout = document.getElementById('logoutBtn');
-    if (logout) logout.onclick = signOut;
   }
 
   function render() {
