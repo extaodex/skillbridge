@@ -1,0 +1,139 @@
+/* SKILLBRIDGE Africa - Styles */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-light: #64748b;
+    --border: #e2e8f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+#app { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 20px 0;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 { font-size: 1.8rem; font-weight: 700; }
+.header .subtitle { opacity: 0.9; font-size: 0.9rem; }
+
+.nav { display: flex; gap: 10px; }
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+.btn-primary { background: white; color: var(--primary); }
+.btn-primary:hover { background: var(--bg); }
+.btn-outline { background: transparent; color: white; border: 1px solid white; }
+.btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+/* Cards */
+.card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.card h2 { margin-bottom: 15px; font-size: 1.3rem; }
+
+/* Grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+/* Profile */
+.profile-card { text-align: center; }
+.avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; margin: 0 auto 15px;
+}
+.profile-card h3 { margin-bottom: 5px; }
+.level-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    background: var(--primary); color: white; font-size: 0.8rem;
+    margin-bottom: 10px;
+}
+.credits { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+
+/* Forms */
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: 600; }
+input, select, textarea {
+    width: 100%; padding: 10px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 0.9rem;
+}
+textarea { min-height: 80px; resize: vertical; }
+
+/* Session */
+.session-card { border-left: 4px solid var(--primary); }
+.session-card .status { font-size: 0.8rem; padding: 2px 8px; border-radius: 10px; }
+.status-pending { background: var(--warning); color: white; }
+.status-accepted { background: var(--success); color: white; }
+.status-completed { background: var(--text-light); color: white; }
+
+/* Credits */
+.credits-list { list-style: none; }
+.credits-list li {
+    display: flex; justify-content: space-between;
+    padding: 10px; border-bottom: 1px solid var(--border);
+}
+.credits-list li:last-child { border-bottom: none; }
+
+/* Badges */
+.badges-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.badge {
+    padding: 10px 15px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+}
+.badge.earned { background: var(--primary); color: white; }
+
+/* Tabs */
+.tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab {
+    padding: 8px 16px; cursor: pointer; border-radius: 8px;
+    background: var(--bg); border: none; font-weight: 600;
+}
+.tab.active { background: var(--primary); color: white; }
+
+/* Notifications */
+.notification {
+    padding: 12px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.notification.unread { background: #eef2ff; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 15px; }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "skillbridge",
+  "version": "1.0.0",
+  "description": "SKILLBRIDGE Africa - Plateforme d'échange de compétences entre étudiants",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
