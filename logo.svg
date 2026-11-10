@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" aria-label="SKILLBRIDGE Africa">
+  <rect x="2" y="2" width="44" height="44" rx="10" fill="#1F6F54"/>
+  <path d="M12 30 Q24 14 36 30" stroke="#D9A441" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <rect x="14" y="30" width="4" height="8" rx="1" fill="#F7F5F0"/>
+  <rect x="30" y="30" width="4" height="8" rx="1" fill="#F7F5F0"/>
+  <circle cx="24" cy="20" r="3" fill="#F7F5F0"/>
+</svg>

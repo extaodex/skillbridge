@@ -171,9 +171,18 @@
     return `
       <div class="shell">
         <aside class="sidebar">
-          <div>
-            <div class="brand">Skill<span>bridge</span></div>
-            <div class="tagline">Échange de compétences entre étudiants</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="36" height="36" aria-label="SKILLBRIDGE">
+              <rect x="2" y="2" width="44" height="44" rx="10" fill="#D9A441"/>
+              <path d="M12 30 Q24 14 36 30" stroke="#1F6F54" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <rect x="14" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
+              <rect x="30" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
+              <circle cx="24" cy="20" r="3" fill="#0B1F1A"/>
+            </svg>
+            <div>
+              <div class="brand">Skill<span>bridge</span></div>
+              <div class="tagline">Échange de compétences entre étudiants</div>
+            </div>
           </div>
           <nav>
             <button data-view="dashboard" class="${state.view === 'dashboard' ? 'active' : ''}">Accueil</button>
@@ -211,6 +220,13 @@
       <div class="auth-wrap">
         <div class="auth-side">
           <div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" aria-label="SKILLBRIDGE" style="margin-bottom:24px">
+              <rect x="2" y="2" width="44" height="44" rx="10" fill="#D9A441"/>
+              <path d="M12 30 Q24 14 36 30" stroke="#1F6F54" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <rect x="14" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
+              <rect x="30" y="30" width="4" height="8" rx="1" fill="#0B1F1A"/>
+              <circle cx="24" cy="20" r="3" fill="#0B1F1A"/>
+            </svg>
             <h1>Échange tes <em>compétences</em>, grandis ensemble.</h1>
             <p>SKILLBRIDGE Africa connecte les étudiants qui veulent apprendre avec ceux qui peuvent enseigner. Gagne des SkillCredits en partageant ton savoir.</p>
           </div>
